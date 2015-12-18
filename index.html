@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:600,400,300' rel='stylesheet' type='text/css'>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Mapa de las elecciones del 2015</title>
+  <meta name="description" content="Twitter map" />
+
+  <link rel="stylesheet" href="http://js.arcgis.com/3.15/esri/css/esri.css">
+  <link href="//cdn-images.mailchimp.com/embedcode/classic-081711.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animate.css">
+  <link rel="stylesheet" href="css/chardinjs.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+  <!--<script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>-->
+
+  <script src="http://80.85.87.124:8080/socket.io/socket.io.js"></script>
+  <script src="js/dojoConfig.js"></script>
+  <script src="http://js.arcgis.com/3.15/"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/twitterMap.js"></script>
+
+</head>
+<body>
+
+
+<div id="attribution" data-intro="No te pierdas otros mapas creados por Esri y nuestra comunidad" data-position="top">
+  <a href="http://esri.es" target="_blank"><img src="images/Esri_logo.png"></a>
+  <h1 id="title">Elecciones generales #20D - Esri España</h1>
+  <div id="social-media" data-intro="Comparte si te gusta" data-position="bottom">
+    <a href="https://twitter.com/intent/tweet?text=Sigue%20el%20mapa%20de%20tweets%20en%20tiempo%20real%20para%20las%20elecciones&url=http://bit.ly/1Padzb0&hashtags=20D&via=Esri_Spain" class="twitter" target="_blank"><i class="fa fa-twitter"></i></a>
+    <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://desarrolladores.esri.es/code/elecciones2015&title=Mapa%20de%20Tweets%20de%20las%20elecciones&summary=Esri%20Espa%C3%B1a%20a%20creado%20este%20mapa%20que%20muestra%20la%20actividad%20en%20Twitter%20de%20la%20conversaci%C3%B3n%20que%20se%20est%C3%A1%20generando%20con%20el%20hashtag%20#20D" class="facebook"><i class="fa fa-facebook" target="_blank"></i></a>
+    <a href="http://www.facebook.com/share.php?&u=http://desarrolladores.esri.es/code/elecciones2015" class="linkedin" target="_blank"><i class="fa fa-linkedin"></i></a>
+  </div>
+</div>
+<button id="more-maps" data-intro="Descubre más mapas" data-position="top"><i class="fa fa-map-o"></i> Más mapas</button>
+
+<div id="mapDiv"></div>
+
+<div id="timeline" data-intro="Visualiza los últimos tweets con el hashtag #20D" data-position="left">
+  <div class="hashtag"> <img src="images/twitter_logo.png"> <span>#20D - <span id="counter"></span> tweets</span></div>
+  <div id="content"><ul></ul></div>
+</div>
+
+<div id="filter" data-intro="Filtra entre los tweets con contengan alguna palabra que te interese">
+  <form action="#" onsubmit="return false;">
+    <p style="margin: 5px	 0 0 0;">
+
+      <a href="#" class="tooltip no-underline">
+        Filtro: <i class="fa fa-question-circle"></i>
+        <span>Puedes utilizar cualquier palabra, incluyendo hashtags, cuentas de twitter, etc. Por ejemplo: @PPopular, @PSOE, @CiudadanosCs, @ahorapodemos, @iunida, @upid, ... </span>
+      </a>
+      <input type="text" onkeyup="filter()" >
+      <!--<button id="btnFilter">OK</button>
+      <button id="btnReset">Todos</button>-->
+    </p>
+  </form>
+</div>
+
+
+<div id="basemap" data-intro="Cambia el mapa" data-position="right">
+  <a href="#" class="basemap"><i class="fa fa-map-o"></i></a>
+</div>
+
+
+<div id="esri-maps" class="hidden">
+  <i class="fa fa-times-circle close"></i>
+  <h2>Recibe los próximos mapas</h2>
+
+  <div id="mc_embed_signup">
+    <form action="//esri.us8.list-manage.com/subscribe/post?u=0d6ace5929da1ada480d89d12&amp;id=b0e73af8bf" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+      <div id="mc_embed_signup_scroll">
+
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Email </label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+        </div>
+        <div class="mc-field-group">
+          <label for="mce-FNAME">Nombre </label>
+          <input type="text" value="" name="FNAME" class="" id="mce-FNAME">
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+        <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0d6ace5929da1ada480d89d12_b0e73af8bf" tabindex="-1" value=""></div>
+        <div class="clear"><input type="submit" value="Inscríbete" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+      </div>
+    </form>
+  </div>
+
+  <div style="text-align:center">
+    <a href="http://votosycifras.com" target="_blank"><img src="images/votosycifras.jpg"/></a>
+  </div>
+
+  <h2>Aprende a crear aplicaciones con mapas como estos</h2>
+  <p>
+    Este mapa ha sido desarrollado por <a href="http://www.meetup.com/es/Geo-Developers/members/139909072/" target="_blank">Raúl Jiménez</a>
+    y <a href="#" target="_blank">Daniel Molina</a> de la <a href="http://meetup.com/Geo-Developers/" target="_blank">
+    comunidad</a> de <a href="http://www.geodevelopers.org" target="_blank">GeoDevelopers.org</a> que ya cuenta con
+    600 miembros. Si quieres aprender a crear mapas como este únete a la comunidad y si quieres puedes empezar a ver
+    algunos de <a href="http://geodevelopers.org/academy/">los vídeos de las charlas que ya hemos organizado</a>.
+  </p>
+  <p>Si eres una empresa tienes interés en realizar un proyecto similar puedes contactar con <a href="http://www.esri.es/es/contacto/" target="_blank">Esri España</a>.</p>
+</div>
+
+<div id="beta">
+  <i class="fa fa-times-circle close"></i>
+  <h1>Se ha producido un error</h1>
+  <p>
+    Queremos pedirte perdón porque hemos detectado que se ha producido un error. La aplicación <strong class="underline">está actualmente en
+    beta</strong> y pero seguimos trabajando en mejorarla.
+  </p>
+
+  <p>
+    Si quieres, puedes ayudarnos a mejorarla <a href="">explicándonos que te ha pasado aquí</a>. El error que se ha
+    producido es el siguiente:
+  </p>
+  <pre id="errorCode"></pre>
+  <p>
+    Si eres desarrollador también puedes ayudarnos a mejorar la aplicación ya que es Open Source. El código
+    lo puedes encontrar en <a href="">este repositorio de Github</a>.
+  </p>
+
+  <p>
+    Para aliviar la posible frustración te dejamos este gif animado tan divertido ^_^.
+  </p>
+  <img src="images/gato.gif">
+</div>
+
+<div id="attr"></div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-49620025-6', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>
