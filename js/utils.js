@@ -4,9 +4,15 @@
  * @param a
  * @param b
  */
-function debug(a, b){
-    if (document.location.hostname == "localhost"){
-      console.log(a, b);
+function debug(type, a, b){
+    if (document.location.hostname == "localhost" || $APP.debug === true){
+      //console.log(a, b);
+      if(b){
+        console[type](a, b);
+      }else{
+        console[type](a);
+      }
+
     }
 }
 
@@ -18,11 +24,19 @@ function debug(a, b){
  * @param id
  */
 function jump(id){
-  var tweet_node = $APP.tweets[id];
-
-  $APP.last_animation = tweet_node;
+  var tweet_node = $APP.tweets[id],
+    attributes = $APP.tweets[id].attributes;
 
   try{
+
+    mixpanel.track("Geolocalizar", {
+      id: (attributes.id)? attributes.id: null,
+      text: (attributes.text)? attributes.id: null,
+      location: (attributes.user.location)? attributes.user.location : "Unknown"
+    });
+
+    $APP.last_animation = tweet_node;
+
     //var a = tweet_node.asdasd.asd;
     map.centerAt(tweet_node.geometry);
 
@@ -59,10 +73,12 @@ function jump(id){
 function showError(e){
   console.error("Error: ",e);
 
+  mixpanel.track("Geolocalizar", {
+    error: e
+  });
+
   $("#errorCode").html(e);
   $("#beta").addClass("show");
-
-
 }
 
 
@@ -258,13 +274,28 @@ function getRandomArbitrary(min, max) {
  * @returns {string}
  */
 function formatDate(d){
-  return [d.getMonth()+1,
-    d.getDate(),
-    d.getFullYear()].join('/')+' '+
-    [d.getHours(),
-      d.getMinutes(),
-      d.getSeconds()].join(':');
+
+  var month = d.getMonth()+ 1,
+      day = d.getDate(),
+      year = d.getFullYear(),
+      t = {
+        hour: d.getHours(),
+        minutes: d.getMinutes(),
+        seconds: d.getSeconds()
+      };
+
+  ["hour", "minutes", "seconds"].forEach(function(elem, i){
+
+    t[elem] = (t[elem] < 10)? "0" + t[elem] : t[elem];
+
+  });
+
+  return [day, month ,year].join('/')+' '+
+    [t.hour, t.minutes, t.seconds].join(':');
 };
+
+/*
+
 
 function initializeTweets(){
 
@@ -285,5 +316,23 @@ function initializeTweets(){
   }
 
 
-}
+}*/
 
+function toggleBasemap(){
+
+  var basemap = map.getBasemap();
+
+  $(this).toggleClass("light");
+
+  $("#attr").toggleClass("on");
+  $("#basemap").toggleClass("on");
+
+  if(basemap=="gray"){
+    map.setBasemap("dark-gray");
+    $("body").addClass("dark");
+  }else{
+    map.setBasemap("gray");
+    $("body").removeClass("dark");
+
+  }
+}

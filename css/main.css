@@ -4,6 +4,25 @@ html, body, #mapDiv {
     height: 100%;
     font-family: 'Open Sans', sans-serif;
 }
+#tos{
+    z-index: 9999;
+    background-color: #000;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    color: #FFF;
+    padding: .5em;
+    text-align: center;
+    border-top: 1px solid #FFF;
+    font-size: .9em;
+}
+#tos a{
+    color: #999;
+
+}
+#tos i{
+    cursor: pointer;
+}
 #attr{
     background-image: url("../images/Esri_white.png");
     width: 54px;
@@ -20,12 +39,13 @@ html, body, #mapDiv {
     background-position-x: center;
     margin-left: -27px;
 }
+
 #attr.on{
     filter: inherit;
     -webkit-filter: inherit;
 }
 #attribution{
-    position: fixed;
+
     z-index: 999;
     top: 0px;
     padding: .3em .5em;
@@ -53,7 +73,7 @@ html, body, #mapDiv {
 #more-maps{
     position: fixed;
     z-index: 999;
-    top: 140px;
+    top: 180px;
     left: 20px;
 }
 #social-media{
@@ -86,12 +106,25 @@ html, body, #mapDiv {
     background-color: #222327;
     color: #EFEFEF;
 }
+#basemap.on .basemap{
+    background-color: #EFEFEF;
+    color: #222327;
+}
 #basemap .basemap.light{
     background-color: #EFEFEF;
     color: #222327;
 }
+#social-media .embed{
+    background-color: #2F2714;
+}
+#embed{
+    display: none;
+}
 #social-media .twitter{
     background-color: #0084b4;
+}
+#social-media .whatsapp{
+    background-color: #34bf49;
 }
 #social-media .facebook{
     background-color: #3b5998;
@@ -102,7 +135,7 @@ html, body, #mapDiv {
 #filter{
     position: fixed;
     z-index: 999;
-    top: 60px;
+    top: 90px;
 
     background-color:  rgba(255,255,255,0.75);
     padding: .3em 1em .7em;
@@ -160,7 +193,7 @@ a.tooltip span
 
 #timeline{
     position: fixed;
-    top: 60px;
+    top: 90px;
     right: 30px;
     bottom: 30px;
     background-color: rgba(255,255,255,0.75);
@@ -258,6 +291,30 @@ a.tooltip span
 #beta img{
     max-width: 100%;
 }
+#cookies{
+    top:90px;
+}
+
+.dark .modal .close{
+    color: white;
+}
+
+.modal{
+    position: fixed;
+    z-index: 9999;
+    background-color:  rgba(255,255,255,0.75);
+    max-width: 550px;
+    top: 60px;
+    left: 25%;
+    right: 30%;
+    padding: 2em;
+
+}
+.content{
+    overflow-y: scroll;
+    max-height: 400px;
+}
+#ie{display:none}
 #esri-maps,
 #beta{
     position: fixed;
@@ -283,8 +340,23 @@ a.tooltip span
     opacity: 1;
     top: 60px;
 }
+.hide{
+    display: none !important;
+}
+.show{
+    display: block !important;
+}
+
+#embed textarea{
+    width: 100%;
+    height: 75px;
+    font-size: .9em;
+}
 #errorCode{
     word-break: break-word;
+}
+.center{
+    text-align: center;
 }
 
 i.close{
@@ -320,7 +392,7 @@ h2{
 .esriSimpleSlider{
     border: 0;
     border-radius: 0;
-    margin-top: 60px;
+    margin-top: 20px;
     background-color: inherit;
 }
 .esriSimpleSliderIncrementButton{
