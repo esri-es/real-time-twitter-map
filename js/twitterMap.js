@@ -1,5 +1,4 @@
 var map, displayTweet, template, geometryEng, limit,
-  is_mobile = false,
   counter = 0,
   $APP = {
     "tweets" : {},
@@ -8,9 +7,6 @@ var map, displayTweet, template, geometryEng, limit,
     "initialized": true,
     "debug": false
   };
-
-
-
 
 
 require([
@@ -51,25 +47,22 @@ require([
   PopupTemplate,
   SimpleRenderer, ScaleDependentRenderer,
   $
-  ) {
+  ){
 
+  var i, tweets, symbol, bb, point, is_contained, content, labels, spainLimits, loadLimit,
+    user, locations, aux, new_graphic, loc, socket,
+  hour = new Date(Date.now()).getHours(),
+    basemap = "gray";
 
   try{
-    if (navigator.appName == 'Microsoft Internet Explorer' ||  !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv 11/))){
-      $("#ie").show();
-    }
+
     $("#tos i").click(function(){
       $("#tos").css("display", "none")
-      $("#filter,#timeline").css("top","60px");
+      $("#filter, #timeline").css("top","60px");
       $("#basemap").css("top","140px");
       $(".esriSimpleSlider").css("margin-top","15px");
 
     });
-
-    var i, tweets, symbol, bb, point, is_contained, content, labels;
-
-    var hour = new Date(Date.now()).getHours(),
-        basemap = "gray";
 
     if(hour > 19 || hour < 8){
       basemap = "dark-gray";
@@ -92,8 +85,7 @@ require([
 
     geometryEng = geometryEngine;
 
-
-    var spainLimits = new FeatureLayer("http://services2.arcgis.com/N7xJ30qLk08SBVO4/arcgis/rest/services/Espa%C3%B1a_simplificada/FeatureServer/0",{id:"boundaries", className: "boundaries"});
+    spainLimits = new FeatureLayer("http://services2.arcgis.com/N7xJ30qLk08SBVO4/arcgis/rest/services/Espa%C3%B1a_simplificada/FeatureServer/0",{id:"boundaries", className: "boundaries"});
     spainLimits.setScaleRange(0,0);
 
     $APP.tweetLayer = new GraphicsLayer({id: "tweets"});
@@ -107,7 +99,7 @@ require([
 
     map.addLayers([spainLimits, $APP.tweetLayer]);
 
-    var loadLimit = function(){
+    loadLimit = function(){
       if(boundaries.graphics[0] && boundaries.graphics[0].geometry){
         limit = boundaries.graphics[0].geometry;
       }else{
@@ -143,66 +135,16 @@ require([
 
     //debug("log", "Start! ", formatDate(new Date(Date.now())));
 
-
     $.extend($.expr[":"], {
       "containsIN": function(elem, i, match, array) {
         return (elem.textContent || elem.innerText || "").toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
       }
     });
 
-    $('#more-maps, #esri-maps .close').click(function(){
-      $("#esri-maps").toggleClass("hidden");
-
-    });
-    $('#more-maps').click(function(){
-      mixpanel.track("View more maps");
-    });
-
-    $("#social-media .embed, #embed .close").click(function(e){
-      e.preventDefault();
-      $("#embed").toggleClass('show');
-    });
-
-    $('#esri-maps form input[type="submit"]').click(function(){
-      var user = {
-        "$email": $('#mce-EMAIL').val(),
-        "name": $('#mce-FNAME').val()
-      };
-
-      mixpanel.people.set(user);
-      mixpanel.identify("12148");
-      mixpanel.track("New subscriber", user);
-      mixpanel.register("$email");
-    });
-
-    $("#esri-maps a").click(function(){
-      mixpanel.track("Click [a] more-maps", {
-        text: $(this).text(),
-        href: $(this).attr('href')
-      });
-    });
-
-    $('#beta .close').click(function(){
-      $("#beta").removeClass("show");
-    });
-    $('#ie .close').click(function(){
-      $("#ie").addClass("hide");
-    });
-    $('#tos a').click(function(){
-      $("#cookies").show();
-      if($("#cookies").hasClass("hide")){
-        $("#cookies").removeClass("hide");
-      }
-    });
-    $('#cookies .close').click(function(){
-      $("#cookies").addClass("hide");
-    });
-
-
     displayTweet = function(tweet){
       //debug("log", tweet);
 
-      var i, d, display = "block";
+      var i, display = "block";
 
 
       if(limit && ( $APP.filter === null || (tweet.text.indexOf($APP.filter) != -1 ))){
@@ -213,9 +155,9 @@ require([
         }else if(tweet.user && tweet.user.geocoding){
           //bb = tweet.user.geocoding.boundingbox;
 
-          var locations = tweet.user.geocoding.locations;
+          locations = tweet.user.geocoding.locations;
           if(locations && locations.length > 0){
-            var aux = locations[0].extent;
+            aux = locations[0].extent;
             bb = [aux.ymin, aux.ymax, aux.xmin, aux.xmax];
           }
           //debug("log", "tweet con: user.geocoding");
@@ -236,24 +178,23 @@ require([
         if(bb){
 
           i = 0;
-
-
-
           do{
-
             item = {
-              lat: getRandomArbitrary(parseFloat(bb[0]), parseFloat(bb[1])),
-              lon: getRandomArbitrary(parseFloat(bb[2]), parseFloat(bb[3]))
+              lat: 0,
+              lon: 0
             };
-            point = new Point(
-              item.lon,
-              item.lat
-            );
+
+            item.lat = getRandomArbitrary(parseFloat(bb[0]), parseFloat(bb[1]));
+            item.lon = getRandomArbitrary(parseFloat(bb[2]), parseFloat(bb[3]));
+
+            point = new Point(item.lon, item.lat);
             point = webMercatorUtils.geographicToWebMercator(point);
             i++;
             is_contained = geometryEng.contains(limit, point);
           }while(!is_contained && i < 20);
 
+          //TODO: check if no contained ... is added? (non-sense)
+          //check if filter
           if(!is_contained){
             display = "none";
           }
@@ -267,8 +208,8 @@ require([
           });
 
           if(is_contained){
-            var loc = new Point(item.lon, item.lat);
-            var new_graphic = new Graphic(loc, symbol, tweet, template);
+            loc = new Point(item.lon, item.lat);
+            new_graphic = new Graphic(loc, symbol, tweet, template);
             $APP.tweetLayer.add(new_graphic);
             $APP.tweets[tweet._id] = new_graphic;
 
@@ -286,13 +227,7 @@ require([
       }
     };
 
-    var socket = io.connect('http://80.85.87.124:8080');
-
-    $("#social-media a").click(function(){
-      mixpanel.track("Social share",{
-        network: $(this).attr("class")
-      });
-    });
+    socket = io.connect('http://80.85.87.124:8080');
 
     socket.on('connect', function () {
       debug("log", 'Socket connected');
@@ -303,23 +238,82 @@ require([
         });
     });
 
+    map.on("basemap-change",function(){
+      labels = map.getLayer(map.layerIds[1]);
+      labels.setVisibility(false);
+    });
+
+    //**************************************************************
+    // Button behaviours
 
     $(".basemap").click(function(){
       toggleBasemap();
       mixpanel.track("Change basemap");
     });
 
-    map.on("basemap-change",function(){
-      labels = map.getLayer(map.layerIds[1]);
-      labels.setVisibility(false);
+    $('#more-maps, #esri-maps .close').click(function(){
+      $("#esri-maps").toggleClass("hidden");
+
     });
+    $('#more-maps').click(function(){
+      mixpanel.track("View more maps");
+    });
+
+    $("#social-media .embed, #embed .close").click(function(e){
+      e.preventDefault();
+      $("#embed").toggleClass('show');
+    });
+
+    $('#esri-maps form input[type="submit"]').click(function(){
+      user = {
+        "$email": $('#mce-EMAIL').val(),
+        "name": $('#mce-FNAME').val()
+      };
+
+      mixpanel.people.set(user);
+      mixpanel.identify("12148");
+      mixpanel.track("New subscriber", user);
+      mixpanel.register("$email");
+    });
+
+    $("#esri-maps a").click(function(){
+      mixpanel.track("Click [a] more-maps", {
+        text: $(this).text(),
+        href: $(this).attr('href')
+      });
+    });
+
+    $('#beta .close').click(function(){
+      $("#beta").removeClass("show");
+    });
+
+    $('#ie .close').click(function(){
+      $("#ie").addClass("hide");
+    });
+
+    $('#tos a').click(function(){
+      $("#cookies").show();
+      if($("#cookies").hasClass("hide")){
+        $("#cookies").removeClass("hide");
+      }
+    });
+
+    $('#cookies .close').click(function(){
+      $("#cookies").addClass("hide");
+    });
+
+    $("#social-media a").click(function(){
+      mixpanel.track("Social share",{
+        network: $(this).attr("class")
+      });
+    });
+
+    // End button behaviours
+    //**************************************************************
 
     loadScript('js/chardinjs.js',function(){
       $('body').chardinJs('start');
     });
-
-    //loadScript('https://getfirebug.com/firebug-lite.js',function(){});
-
 
     loadScript('http://s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js',function(){
       (function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';

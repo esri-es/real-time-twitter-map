@@ -3,6 +3,8 @@ html, body, #mapDiv {
     margin: 0;
     height: 100%;
     font-family: 'Open Sans', sans-serif;
+    box-sizing: border-box;
+
 }
 #tos{
     z-index: 9999;
@@ -11,10 +13,10 @@ html, body, #mapDiv {
     left: 0;
     width: 100%;
     color: #FFF;
-    padding: .5em;
+    padding: .5em 0;
     text-align: center;
     border-top: 1px solid #FFF;
-    font-size: .9em;
+    font-size: 13px;
 }
 #tos a{
     color: #999;
@@ -48,7 +50,7 @@ html, body, #mapDiv {
 
     z-index: 999;
     top: 0px;
-    padding: .3em .5em;
+    padding: .3em 0;
     width: 100%;
     background-color: #FFF;
     left: 0;
@@ -59,6 +61,7 @@ html, body, #mapDiv {
     display: inline-block;
     float: left;
     height: 28px;
+    margin-left: .5em;
 }
 #title{
 
@@ -199,7 +202,8 @@ a.tooltip span
     background-color: rgba(255,255,255,0.75);
     padding: 1em;
     width: 20%;
-    overflow-y: scroll;
+    overflow-y: hidden;
+    overflow-x: hidden;
 }
 #timeline ul{
     list-style: none;
@@ -218,6 +222,7 @@ a.tooltip span
     position: relative;
     height: 93%;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 .slider.closed {
     max-height: 0;
@@ -273,7 +278,7 @@ a.tooltip span
 .esriViewPopup .text{
     display: block;
     margin: 5px 0;
-    word-break: break-all;
+    word-break: break-word;
 }
 .geolocate{
     background-color: #00aced;
